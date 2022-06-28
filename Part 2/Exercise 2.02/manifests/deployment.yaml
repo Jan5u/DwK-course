@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      volumes:
+        - name: shared-todo-app
+          persistentVolumeClaim:
+            claimName: todo-app-claim
+      containers:
+        - name: todo-app
+          image: jan5u/todo-app:latest
+          volumeMounts:
+            - name: shared-todo-app
+              mountPath: /usr/src/app/files
+        - name: todo-app-backend
+          image: jan5u/todo-app-backend:latest
+          volumeMounts:
+            - name: shared-todo-app
+              mountPath: /usr/src/app/files
