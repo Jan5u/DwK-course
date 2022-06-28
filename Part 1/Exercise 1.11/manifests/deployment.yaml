@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: generate-timestamp-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: generate-timestamp
+  template:
+    metadata:
+      labels:
+        app: generate-timestamp
+    spec:
+      volumes:
+        - name: shared-timestamp
+          persistentVolumeClaim:
+            claimName: pingpong-claim
+      containers:
+        - name: generate-timestamp
+          image: jan5u/generate-timestamp:latest
+          volumeMounts:
+            - name: shared-timestamp
+              mountPath: /usr/src/app/files
+        - name: log-output
+          image: jan5u/log-output:latest
+          volumeMounts:
+            - name: shared-timestamp
+              mountPath: /usr/src/app/files
+        - name: ping-pong
+          image: jan5u/ping-pong:latest
+          volumeMounts:
+            - name: shared-timestamp
+              mountPath: /usr/src/app/files
